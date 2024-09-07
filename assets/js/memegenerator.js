@@ -408,9 +408,11 @@ class MemeGenerator {
 
     downloadMeme() {
         const canvas = this.memePreview.querySelector('canvas');
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'meme.png';
-        link.click();
-    }
+        canvas.toBlob((blob) => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'meme.png';
+            link.click();
+        }, 'image/png');
+    }    
 }
