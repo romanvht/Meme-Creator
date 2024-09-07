@@ -1,0 +1,313 @@
+:root {
+    --primary-color: #1E88E5;
+    --background-color: #121212;
+    --surface-color: #1F1F1F;
+    --text-color: #E0E0E0;
+    --secondary-text-color: #B0B0B0;
+    --border-radius: 12px;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+img {
+    pointer-events: none;
+    user-select: none;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+#app {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--surface-color);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+h1 {
+    margin: 0;
+    color: var(--primary-color);
+    font-weight: 500;
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+button {
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 16px;
+    margin: 0;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #1976D2; /* Более тёмный синий на ховер */
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#image-container {
+    text-align: center;
+}
+
+#image-editor {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#meme-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+}
+
+.text-field {
+    position: absolute;
+    line-height: 1.1;
+    font-weight: 600;
+    padding: 2px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
+    cursor: move;
+    touch-action: none;
+}
+
+.text-field.active {
+    border: 1px solid rgba(0, 0, 0, 0.7);
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.text-input {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow: hidden;
+    outline: none;
+}
+
+#templates-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.template-item {
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+    width: 150px;
+    height: 150px;
+    background-color: var(--surface-color);
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.template-item:hover {
+    border-color: var(--primary-color);
+}
+
+.template-item img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.delete-template-btn {
+    background-color: var(--background-color);
+    background-image: url('../img/trash.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 60%;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    border-bottom-left-radius: 5px;
+}
+
+.delete-template-btn:hover {
+    background-color: rgb(110, 0, 0);
+}
+
+.resizer {
+    width: 10px;
+    height: 10px;
+    background: blue;
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    cursor: se-resize;
+    border-radius: 0px 5px 5px 5px;
+}
+
+.resizer:hover {
+    background: rgb(0, 0, 110);
+}
+
+.delete-btn {
+    width: 10px;
+    height: 10px;
+    background: rgb(255, 0, 0);
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    cursor: pointer;
+    border-radius: 5px 5px 5px 0px;
+}
+
+.delete-btn:hover {
+    background: rgb(110, 0, 0);
+}
+
+#editor-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    color: var(--text-color);
+    gap: 10px;
+}
+
+#editor-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+#editor-controls input[type="color"] {
+    vertical-align: middle;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 1px solid var(--primary-color);
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    height: 25px;
+    width: 50px;
+    padding: 0;
+}
+
+#editor-controls input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#editor-controls input[type="color"]::-webkit-color-swatch{
+    border: 0;
+    border-radius: 0;
+}
+
+#editor-controls input[type="number"] {
+    margin: 5px 0px;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 5px;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    width: 50px;
+}
+
+#editor-controls select {
+    margin: 5px 0px;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 5px;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+}
+
+#meme-creator {
+    text-align: center;
+}
+
+#meme-preview {
+    margin-top: 20px;
+
+}
+
+#meme-preview img, #meme-preview canvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+}
+
+#download-button {
+    margin: auto;
+    margin-top: 20px;
+    background-color: #008CBA;
+}
+
+#upload-btn {
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    #app {
+        padding: 10px;
+    }
+
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #editor-controls {
+        flex-direction: column;
+    }
+
+    .resizer {
+        width: 20px;
+        height: 20px;
+        right: -20px;
+        bottom: -20px;
+        border-radius: 0px 10px 10px 10px;
+    }
+    
+    .delete-btn {
+        width: 20px;
+        height: 20px;
+        right: -20px;
+        top: -20px;
+        border-radius: 10px 10px 10px 0px;
+    }
+}
