@@ -407,12 +407,22 @@ class MemeGenerator {
     }
 
     downloadMeme() {
+        const downloadBtn = this.downloadMemeBtn;
+        const loadingAnimation = document.getElementById('loading-animation');
+        
+        downloadBtn.disabled = true;
+        loadingAnimation.style.display = 'inline-block';
+    
         const canvas = this.memePreview.querySelector('canvas');
+    
         canvas.toBlob((blob) => {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'meme.png';
             link.click();
+
+            downloadBtn.disabled = false;
+            loadingAnimation.style.display = 'none';
         }, 'image/png');
-    }    
+    }       
 }

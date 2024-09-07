@@ -277,6 +277,28 @@ input[type="file"] {
     background-color: #008CBA;
 }
 
+#loading-animation {
+    display: inline-block;
+    color: rgba(255, 255, 255, .7);
+    line-height: 100%;
+    font-size: 30px;
+    margin-top: 10px;
+}
+
+.dots::after {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    animation: dot-blink 1s steps(5, end) infinite;
+}
+
+@keyframes dot-blink {
+    0%, 100% { content: ''; }
+    20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+}
+
 #upload-btn {
     margin-top: 20px;
 }
