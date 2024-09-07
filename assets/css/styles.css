@@ -65,7 +65,7 @@ button {
 }
 
 button:hover {
-    background-color: #1976D2; /* Более тёмный синий на ховер */
+    background-color: #1976D2;
 }
 
 input[type="file"] {
