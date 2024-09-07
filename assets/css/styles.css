@@ -279,18 +279,26 @@ input[type="file"] {
     transition: all .2s;
 }
 
-#download-dots::after {
+.download-dots::after {
     content: '';
-    display: inline-block;
+    display: none;
     width: 1em;
     animation: dot-blink 1s steps(5, end) infinite;
 }
 
+#download-button.loading .download-text {
+    display: none;
+}
+
+#download-button.loading .download-dots {
+    display: inline-block;
+}
+
 @keyframes dot-blink {
     0%, 100% { content: ''; }
-    20% { content: '.'; }
-    40% { content: '..'; }
-    60% { content: '...'; }
+    20% { content: '•'; }
+    40% { content: '••'; }
+    60% { content: '•••'; }
 }
 
 #upload-btn {

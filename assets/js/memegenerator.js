@@ -408,12 +408,8 @@ class MemeGenerator {
 
     downloadMeme() {
         const downloadBtn = this.downloadMemeBtn;
-        const downloadText = document.getElementById('download-text');
-        const downloadDots = document.getElementById('download-dots');
-        
+        downloadBtn.classList.add('loading');
         downloadBtn.disabled = true;
-        downloadText.style.display = 'none';
-        downloadDots.style.display = 'inline';
     
         const canvas = this.memePreview.querySelector('canvas');
     
@@ -423,9 +419,8 @@ class MemeGenerator {
             link.download = 'meme.png';
             link.click();
 
+            downloadBtn.classList.remove('loading');
             downloadBtn.disabled = false;
-            downloadText.style.display = 'inline';
-            downloadDots.style.display = 'none';
         }, 'image/png');
     }       
 }
