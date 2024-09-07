@@ -275,17 +275,11 @@ input[type="file"] {
     margin: auto;
     margin-top: 20px;
     background-color: #008CBA;
+    min-width: 100px;
+    transition: all .2s;
 }
 
-#loading-animation {
-    display: inline-block;
-    color: rgba(255, 255, 255, .7);
-    line-height: 100%;
-    font-size: 30px;
-    margin-top: 10px;
-}
-
-.dots::after {
+#download-dots::after {
     content: '';
     display: inline-block;
     width: 1em;
