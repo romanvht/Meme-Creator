@@ -296,9 +296,10 @@ input[type="file"] {
 
 @keyframes dot-blink {
     0%, 100% { content: ''; }
-    20% { content: '•'; }
-    40% { content: '••'; }
-    60% { content: '•••'; }
+    20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80% { content: '....'; }
 }
 
 #upload-btn {
