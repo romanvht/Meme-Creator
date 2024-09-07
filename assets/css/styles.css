@@ -279,11 +279,8 @@ input[type="file"] {
     transition: all .2s;
 }
 
-.download-dots::after {
-    content: '';
+#download-button.download-dots {
     display: none;
-    width: 1em;
-    animation: dot-blink 1s steps(5, end) infinite;
 }
 
 #download-button.loading .download-text {
@@ -294,12 +291,19 @@ input[type="file"] {
     display: inline-block;
 }
 
+.download-dots::after {
+    content: '';
+    display: inline-block;
+    animation: dot-blink 1s steps(5, end) infinite;
+    width: 1em;
+}
+
 @keyframes dot-blink {
     0%, 100% { content: ''; }
-    20% { content: '.'; }
-    40% { content: '..'; }
-    60% { content: '...'; }
-    80% { content: '....'; }
+    20% { content: '•'; }
+    40% { content: '••'; }
+    60% { content: '•••'; }
+    80% { content: '••••'; }
 }
 
 #upload-btn {
