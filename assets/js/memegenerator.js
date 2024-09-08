@@ -32,7 +32,6 @@ class MemeGenerator {
         this.downloadMemeBtn = document.getElementById('download-button');
         this.fontSizeControl = document.getElementById('font-size');
         this.textAlignControl = document.getElementById('text-align-control');
-        this.resetBgColorBtn = document.getElementById('reset-bg-color');
     }
 
     initHandlers() {
@@ -45,7 +44,6 @@ class MemeGenerator {
         this.textAlignControl.addEventListener('change', () => this.changeTextAlign());
         this.generateMemeBtn.addEventListener('click', () => this.generateMeme());
         this.downloadMemeBtn.addEventListener('click', () => this.downloadMeme());
-        this.resetBgColorBtn.addEventListener('click', () => this.resetBackgroundColor());
     }
 
     initDB() {
