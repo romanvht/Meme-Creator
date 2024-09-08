@@ -326,6 +326,10 @@ input[type="file"] {
         flex: 1 1 45%;
     }
 
+    #editor-controls span{
+        display: block;
+    }
+
     .resizer {
         width: 20px;
         height: 20px;

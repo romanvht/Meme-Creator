@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Конструктор мемов</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v1.1.0">
+    <link rel="stylesheet" href="assets/css/styles.css?v1.1.01">
 </head>
 <body>
     <div id="app">
@@ -24,16 +24,19 @@
             </div>
             <div id="editor-controls">
                 <div class="background-editor">
-                    Цвет фона: <input type="color" id="background-color" value="#000000">
+                    <span>Цвет фона:</span>
+                    <input type="color" id="background-color" value="#000000">
                 </div>
                 <div class="color-editor">
-                    Цвет текста: <input type="color" id="text-color" value="#000000">
+                    <span>Цвет текста:</span>
+                    <input type="color" id="text-color" value="#000000">
                 </div>
                 <div class="font-editor">
-                    Размер текста: <input id="font-size" type="number" value="14" min="10" max="50">
+                    <span>Размер текста:</span>
+                    <input id="font-size" type="number" value="14" min="10" max="50">
                 </div>
                 <div class="font-align">
-                    <label for="text-align-control">Выравнивание:</label>
+                    <span>Выравнивание:</span>
                     <select id="text-align-control">
                         <option value="left">Влево</option>
                         <option value="center">Центр</option>
@@ -58,7 +61,7 @@
         </div>
     </div>
 
-    <script src="assets/js/memegenerator.js?v1.1.0"></script>
+    <script src="assets/js/memegenerator.js?v1.1.01"></script>
     <script>
         const memeGenerator = new MemeGenerator();
     </script>

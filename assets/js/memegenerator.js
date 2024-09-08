@@ -32,18 +32,20 @@ class MemeGenerator {
         this.downloadMemeBtn = document.getElementById('download-button');
         this.fontSizeControl = document.getElementById('font-size');
         this.textAlignControl = document.getElementById('text-align-control');
+        this.resetBgColorBtn = document.getElementById('reset-bg-color');
     }
 
     initHandlers() {
         this.uploadBtn.addEventListener('click', () => this.imageUpload.click());
         this.imageUpload.addEventListener('change', (e) => this.handleImageUpload(e));
-        this.addTextFieldBtn.addEventListener('click', () => this.addTextField('5%', '5%', '30%', '15%', '#000000', 'rgba(0, 0, 0, 0)', ''));
+        this.addTextFieldBtn.addEventListener('click', () => this.addTextField());
         this.textColor.addEventListener('change', () => this.updateTextColor());
         this.backgroundColor.addEventListener('change', () => this.updateBackgroundColor());
-        this.fontSizeControl.addEventListener('input', (e) => this.changeFontSize(e.target.value));
-        this.textAlignControl.addEventListener('change', (e) => this.changeTextAlign(e.target.value));
+        this.fontSizeControl.addEventListener('input', () => this.changeFontSize());
+        this.textAlignControl.addEventListener('change', () => this.changeTextAlign());
         this.generateMemeBtn.addEventListener('click', () => this.generateMeme());
         this.downloadMemeBtn.addEventListener('click', () => this.downloadMeme());
+        this.resetBgColorBtn.addEventListener('click', () => this.resetBackgroundColor());
     }
 
     initDB() {
@@ -87,7 +89,7 @@ class MemeGenerator {
         }
     }
 
-    addTextField(left, top, width, height, color, backgroundColor, text, fontSize = 16, textAlign = 'left') {
+    addTextField(left = '5%', top = '5%', width = '30%', height = '15%', color = '#000000', backgroundColor = 'rgba(0, 0, 0, 0)', text = '', fontSize = 16, textAlign = 'left') {
         const textField = document.createElement('div');
         textField.className = 'text-field';
 
@@ -159,15 +161,15 @@ class MemeGenerator {
         }
     }
 
-    changeFontSize(size) {
+    changeFontSize() {
         if (this.currentTextField) {
-            this.currentTextField.style.fontSize = `${size}px`;
+            this.currentTextField.style.fontSize = `${this.fontSizeControl.value}px`;
         }
     }
 
-    changeTextAlign(align) {
+    changeTextAlign() {
         if (this.currentTextField) {
-            this.currentTextField.style.textAlign = align;
+            this.currentTextField.style.textAlign = this.textAlignControl.value;
         }
     }    
 
@@ -406,7 +408,7 @@ class MemeGenerator {
                 const fontWeight = window.getComputedStyle(field.element).fontWeight;
                 const fontStyle = window.getComputedStyle(field.element).fontStyle;
                 const textAlign = window.getComputedStyle(field.element).textAlign;
-                const lineHeight = fontSize * 1.1;
+                const lineHeight = fontSize;
 
                 if (backgroundColor !== 'rgba(0, 0, 0, 0)') {
                     ctx.fillStyle = backgroundColor;
