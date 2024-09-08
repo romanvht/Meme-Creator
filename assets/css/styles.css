@@ -95,14 +95,14 @@ input[type="file"] {
     line-height: 1.1;
     font-weight: 600;
     padding: 2px;
-    border: 2px dotted rgba(0, 0, 0, 0.3);
+    outline: 1px dotted rgba(0, 0, 0, .3);
     color: var(--text-color);
     cursor: move;
     touch-action: none;
 }
 
 .text-field.active {
-    border: 2px dotted rgba(0, 0, 0, 0.7);
+    outline: 1px dotted rgba(0, 0, 0, .9);
 }
 
 .text-input {
