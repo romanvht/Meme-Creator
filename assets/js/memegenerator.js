@@ -23,6 +23,7 @@ class MemeGenerator {
         this.textFieldsContainer = document.getElementById('text-fields-container');
         this.addTextFieldBtn = document.getElementById('add-text-field');
         this.textColor = document.getElementById('text-color');
+        this.backgroundColor = document.getElementById('background-color');
         this.templatesList = document.getElementById('templates-list');
         this.templatesContainer = document.getElementById('templates-container');
         this.memeCreator = document.getElementById('meme-creator');
@@ -36,8 +37,9 @@ class MemeGenerator {
     initHandlers() {
         this.uploadBtn.addEventListener('click', () => this.imageUpload.click());
         this.imageUpload.addEventListener('change', (e) => this.handleImageUpload(e));
-        this.addTextFieldBtn.addEventListener('click', () => this.addTextField('5%', '5%', '30%', '15%', "#000000", ''));
+        this.addTextFieldBtn.addEventListener('click', () => this.addTextField('5%', '5%', '30%', '15%', '#000000', 'rgba(0, 0, 0, 0)', ''));
         this.textColor.addEventListener('change', () => this.updateTextColor());
+        this.backgroundColor.addEventListener('change', () => this.updateBackgroundColor());
         this.fontSizeControl.addEventListener('input', (e) => this.changeFontSize(e.target.value));
         this.textAlignControl.addEventListener('change', (e) => this.changeTextAlign(e.target.value));
         this.generateMemeBtn.addEventListener('click', () => this.generateMeme());
@@ -85,7 +87,7 @@ class MemeGenerator {
         }
     }
 
-    addTextField(left, top, width, height, color, text, fontSize = 16, textAlign = 'left') {
+    addTextField(left, top, width, height, color, backgroundColor, text, fontSize = 16, textAlign = 'left') {
         const textField = document.createElement('div');
         textField.className = 'text-field';
 
@@ -96,6 +98,7 @@ class MemeGenerator {
             width,
             height,
             color,
+            backgroundColor,
             fontSize: `${fontSize}px`,
             textAlign
         });
@@ -123,6 +126,7 @@ class MemeGenerator {
                 height: textField.style.height
             }),
             getColor: () => textField.style.color,
+            getBackgroundColor: () => textField.style.backgroundColor,
             getFontSize: () => parseInt(textField.style.fontSize),
             getTextAlign: () => textField.style.textAlign
         });
@@ -133,12 +137,21 @@ class MemeGenerator {
         this.fontSizeControl.value = parseInt(textField.style.fontSize);
         this.textAlignControl.value = textField.style.textAlign;
 
-        const rgb = textField.style.color;
-        this.textColor.value = rgb.startsWith('rgb') ? `#${rgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : rgb;
+        const textRgb = textField.style.color;
+        this.textColor.value = textRgb.startsWith('rgb') ? `#${textRgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : textRgb;
 
+        const backgroundRgb = textField.style.backgroundColor;
+        this.backgroundColor.value = backgroundRgb.startsWith('rgb') ? `#${backgroundRgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : backgroundRgb;
+    
         document.querySelectorAll('.text-field').forEach(field => field.classList.remove('active'));
         textField.classList.add('active');
-    }    
+    }
+    
+    updateBackgroundColor() {
+        if (this.currentTextField) {
+            this.currentTextField.style.backgroundColor = this.backgroundColor.value;
+        }
+    }
 
     updateTextColor() {
         if (this.currentTextField) {
@@ -291,6 +304,7 @@ class MemeGenerator {
                 field.size.width,
                 field.size.height,
                 field.color,
+                field.backgroundColor,
                 field.text,
                 field.fontSize,
                 field.textAlign
@@ -313,6 +327,7 @@ class MemeGenerator {
                 position: field.getPosition(),
                 size: field.getSize(),
                 color: field.getColor(),
+                backgroundColor: field.getBackgroundColor(),
                 text: field.getText(),
                 fontSize: field.getFontSize(),
                 textAlign: field.getTextAlign()
@@ -385,11 +400,18 @@ class MemeGenerator {
                 const xPos = left * scaleX;
                 const yPos = top * scaleY;
                 const maxWidth = rect.width * scaleX;
+                const maxHeight = rect.height * scaleY;
+                const backgroundColor = field.getBackgroundColor();
                 const fontSize = parseInt(window.getComputedStyle(field.element).fontSize, 10) * scaleY;
                 const fontWeight = window.getComputedStyle(field.element).fontWeight;
                 const fontStyle = window.getComputedStyle(field.element).fontStyle;
                 const textAlign = window.getComputedStyle(field.element).textAlign;
                 const lineHeight = fontSize * 1.1;
+
+                if (backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                    ctx.fillStyle = backgroundColor;
+                    ctx.fillRect(xPos, yPos, maxWidth, maxHeight);
+                }
 
                 ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px Arial`;
                 ctx.fillStyle = field.getColor();
