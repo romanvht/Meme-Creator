@@ -87,7 +87,7 @@ class MemeGenerator {
         }
     }
 
-    addTextField(left = '5%', top = '5%', width = '30%', height = '15%', color = '#000000', backgroundColor = 'rgba(0, 0, 0, 0)', text = '', fontSize = 16, textAlign = 'left') {
+    addTextField(left = '5%', top = '5%', width = '30%', height = '15%', color = '#000000', backgroundColor = 'rgba(0, 0, 0, 0)', text = '', fontSize = 16, textAlign = 'center') {
         const textField = document.createElement('div');
         textField.className = 'text-field';
 
@@ -418,7 +418,7 @@ class MemeGenerator {
                 ctx.textBaseline = 'top';
                 ctx.textAlign = textAlign;
 
-                this.wrapText(ctx, field.getText(), xPos, yPos, maxWidth, lineHeight, textAlign);
+                this.wrapText(ctx, field.getText(), xPos, yPos, maxWidth, maxHeight, lineHeight, textAlign);
             });
 
             this.memePreview.innerHTML = '';
@@ -432,9 +432,9 @@ class MemeGenerator {
         img.src = this.currentImage;
     }
 
-    wrapText(ctx, text, x, y, maxWidth, lineHeight, textAlign) {
+    wrapText(ctx, text, x, y, blockWidth, blockHeight, lineHeight, textAlign) {
         const paragraphs = text.split(/\n/);
-        let yOffset = 0;
+        const lines = [];
 
         paragraphs.forEach(paragraph => {
             const words = paragraph.split(' ');
@@ -442,27 +442,28 @@ class MemeGenerator {
 
             words.forEach((word, index) => {
                 const testLine = line + word + ' ';
-                const metrics = ctx.measureText(testLine);
-                const testWidth = metrics.width;
+                const testWidth = ctx.measureText(testLine).width;
 
-                if (testWidth > maxWidth && index > 0) {
-                    let textX = x;
-                    textX = textAlign === 'center' ? x + maxWidth / 2 : textAlign === 'right' ? x + maxWidth : x;
-
-                    ctx.fillText(line.trim(), textX, y + yOffset);
-
+                if (testWidth > blockWidth && index > 0) {
+                    lines.push(line.trim());
                     line = word + ' ';
-                    yOffset += lineHeight;
                 } else {
                     line = testLine;
                 }
             });
 
-            let textX = x;
-            textX = textAlign === 'center' ? x + maxWidth / 2 : textAlign === 'right' ? x + maxWidth : x;
+            lines.push(line.trim());
+        });
 
-            ctx.fillText(line.trim(), textX, y + yOffset);
-            yOffset += lineHeight;
+        const totalTextHeight = lineHeight * lines.length;
+        const yStart = y + (blockHeight - totalTextHeight) / 2;
+
+        lines.forEach((line, index) => {
+            let textX = x;
+            textX = textAlign === 'center' ? x + blockWidth / 2 : textAlign === 'right' ? x + blockWidth : x;
+
+            const yOffset = yStart + index * lineHeight;
+            ctx.fillText(line, textX, yOffset);
         });
     }
 

@@ -92,7 +92,7 @@ input[type="file"] {
 
 .text-field {
     position: absolute;
-    line-height: 1.1;
+    line-height: 100%;
     font-weight: 600;
     padding: 2px;
     outline: 1px dotted rgba(0, 0, 0, .3);
@@ -106,6 +106,9 @@ input[type="file"] {
 }
 
 .text-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: absolute;
     top: 0px;
     left: 0px;
