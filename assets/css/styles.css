@@ -116,6 +116,7 @@ input[type="file"] {
     bottom: 0px;
     overflow: hidden;
     outline: none;
+    font-family: Arial;
 }
 
 #templates-container {

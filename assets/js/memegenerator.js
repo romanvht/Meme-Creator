@@ -437,7 +437,7 @@ class MemeGenerator {
         const lines = [];
 
         paragraphs.forEach(paragraph => {
-            const words = paragraph.split(' ');
+            const words = paragraph.split(/\s+/);
             let line = '';
 
             words.forEach((word, index) => {
@@ -460,7 +460,20 @@ class MemeGenerator {
 
         lines.forEach((line, index) => {
             let textX = x;
-            textX = textAlign === 'center' ? x + blockWidth / 2 : textAlign === 'right' ? x + blockWidth : x;
+            
+            switch (textAlign) {
+                case 'left':
+                    textX = x;
+                    ctx.textAlign = 'left';
+                    break;
+                case 'right':
+                    textX = x + blockWidth;
+                    ctx.textAlign = 'right';
+                    break;
+                default:
+                    textX = x + blockWidth / 2;
+                    ctx.textAlign = 'center';
+            }
 
             const yOffset = yStart + index * lineHeight;
             ctx.fillText(line, textX, yOffset);
