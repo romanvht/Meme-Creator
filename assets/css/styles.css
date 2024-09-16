@@ -328,7 +328,6 @@ input[type="file"] {
 }
 
 @keyframes dot-blink {
-
     0%,
     100% {
         content: '';
