@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Конструктор мемов</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/styles.css?v1.1.06">
+    <link rel="stylesheet" href="assets/css/styles.css?v1.1.10">
 </head>
+
 <body>
     <div id="app">
         <h1><a href="index.html">Конструктор мемов</a></h1>
-        
+
         <div id="upload-section">
             <input type="file" id="image-upload" accept="image/*">
             <button id="upload-btn">Загрузить изображение</button>
@@ -47,25 +49,39 @@
                 </div>
             </div>
             <div id="editor-buttons">
-                <button id="add-text-field">Добавить текст</button><br/>
+                <button id="add-text-field">Добавить текст</button><br />
                 <button id="generate-button">Создать</button>
             </div>
         </div>
 
         <div id="meme-creator" style="display: none;">
             <div id="meme-preview"></div>
-            <button id="download-button"><span class="download-text">Скачать</span><span class="download-dots"></span></button>
+            <button id="download-button"><span class="download-text">Скачать</span><span
+                    class="download-dots"></span></button>
         </div>
 
         <div id="templates-list">
             <h2>Мои шаблоны</h2>
-            <div id="templates-container"></div>
+            <div id="templates-container">
+                <div class="preloader">
+                    <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#fff">
+                        <g fill="none" fill-rule="evenodd">
+                            <g transform="translate(1 1)" stroke-width="2">
+                                <circle stroke-opacity=".5" cx="18" cy="18" r="18" />
+                                <path d="M36 18c0-9.94-8.06-18-18-18" />
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="assets/js/memegenerator.js?v1.1.06"></script>
+    <script src="assets/js/storage.js?v1.1.10"></script>
+    <script src="assets/js/memegenerator.js?v1.1.10"></script>
     <script>
         const memeGenerator = new MemeGenerator();
     </script>
 </body>
+
 </html>

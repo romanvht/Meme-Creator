@@ -1,9 +1,5 @@
 class MemeGenerator {
     constructor() {
-        this.dbName = 'MemeDB';
-        this.dbVersion = 1;
-        this.db = null;
-
         this.currentImage = null;
         this.currentTemplateIndex = null;
         this.textFields = [];
@@ -11,10 +7,16 @@ class MemeGenerator {
 
         this.initElements();
         this.initHandlers();
-        this.initDB();
+
+        this.storage = new Storage();
+
+        this.storage.onDbReady(() => {
+            this.loadTemplatesFromDB();
+        });
     }
 
     initElements() {
+        this.preloader = document.getElementById('p_prldr');
         this.uploadSection = document.getElementById('upload-section');
         this.imageUpload = document.getElementById('image-upload');
         this.uploadBtn = document.getElementById('upload-btn');
@@ -44,26 +46,6 @@ class MemeGenerator {
         this.textAlignControl.addEventListener('change', () => this.changeTextAlign());
         this.generateMemeBtn.addEventListener('click', () => this.generateMeme());
         this.downloadMemeBtn.addEventListener('click', () => this.downloadMeme());
-    }
-
-    initDB() {
-        const request = indexedDB.open(this.dbName, this.dbVersion);
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('templates')) {
-                db.createObjectStore('templates', { keyPath: 'index' });
-            }
-        };
-
-        request.onsuccess = (event) => {
-            this.db = event.target.result;
-            this.loadTemplatesFromDB();
-        };
-
-        request.onerror = (event) => {
-            console.error('Ошибка открытия базы данных: ', event.target.errorCode);
-        };
     }
 
     handleImageUpload(e) {
@@ -260,6 +242,11 @@ class MemeGenerator {
     }
 
     updateTemplatesList() {
+        if(this.templates.length === 0){
+            this.templatesContainer.innerHTML = 'Вы пока не сохраняли изображения';
+            return;
+        }
+
         this.templatesContainer.innerHTML = '';
         this.templates.forEach((template, index) => {
             const templateEl = document.createElement('div');
@@ -274,7 +261,7 @@ class MemeGenerator {
 
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.deleteTemplate(template.index);
+                this.deleteTemplateFromDB(template.index);
             });
 
             templateEl.appendChild(img);
@@ -316,7 +303,6 @@ class MemeGenerator {
 
     saveTemplate() {
         if (!this.currentImage) {
-            alert('Пожалуйста, сначала загрузите изображение');
             return;
         }
 
@@ -334,48 +320,23 @@ class MemeGenerator {
             }))
         };
 
-        const transaction = this.db.transaction(['templates'], 'readwrite');
-        const store = transaction.objectStore('templates');
-        
-        store.put(templateData);
-
-        transaction.oncomplete = () => {
+        this.storage.saveTemplate(templateData, () => {
             this.updateTemplatesList();
-        };
-
-        transaction.onerror = (event) => {
-            console.error('Ошибка сохранения шаблона: ', event.target.errorCode);
-        };
+        });
     }
 
     loadTemplatesFromDB() {
-        const transaction = this.db.transaction(['templates'], 'readonly');
-        const store = transaction.objectStore('templates');
-        const request = store.getAll();
-
-        request.onsuccess = (event) => {
-            this.templates = event.target.result;
+        this.storage.loadTemplates((templates) => {
+            this.templates = templates;
             this.updateTemplatesList();
-        };
-
-        request.onerror = (event) => {
-            console.error('Ошибка загрузки шаблонов: ', event.target.errorCode);
-        };
+        });
     }
 
-    deleteTemplate(index) {
-        const transaction = this.db.transaction(['templates'], 'readwrite');
-        const store = transaction.objectStore('templates');
-        store.delete(index);
-
-        transaction.oncomplete = () => {
+    deleteTemplateFromDB(index) {
+        this.storage.deleteTemplate(index, () => {
             this.templates = this.templates.filter(template => template.index !== index);
             this.updateTemplatesList();
-        };
-
-        transaction.onerror = (event) => {
-            console.error('Ошибка удаления шаблона: ', event.target.errorCode);
-        };
+        });
     }
 
     generateMeme() {

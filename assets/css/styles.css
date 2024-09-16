@@ -31,6 +31,27 @@ a {
     color: var(--primary-color);
 }
 
+.preloader {
+    display: block;
+    text-align: center;
+}
+
+.preloader svg {
+    animation: rotate .5s linear infinite;
+    width: 50px;
+    height: 50px;
+}
+
+@keyframes rotate {
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 #app {
     max-width: 800px;
     margin: 0 auto;
@@ -70,6 +91,10 @@ button:hover {
 
 input[type="file"] {
     display: none;
+}
+
+#upload-section {
+    text-align: center;
 }
 
 #image-container {
@@ -234,7 +259,7 @@ input[type="file"] {
     padding: 0;
 }
 
-#editor-controls input[type="color"]::-webkit-color-swatch{
+#editor-controls input[type="color"]::-webkit-color-swatch {
     border: 0;
     border-radius: 0;
 }
@@ -267,7 +292,8 @@ input[type="file"] {
 
 }
 
-#meme-preview img, #meme-preview canvas {
+#meme-preview img,
+#meme-preview canvas {
     max-width: 100%;
     height: auto;
     border-radius: var(--border-radius);
@@ -301,11 +327,27 @@ input[type="file"] {
 }
 
 @keyframes dot-blink {
-    0%, 100% { content: ''; }
-    20% { content: '•'; }
-    40% { content: '••'; }
-    60% { content: '•••'; }
-    80% { content: '••••'; }
+
+    0%,
+    100% {
+        content: '';
+    }
+
+    20% {
+        content: '•';
+    }
+
+    40% {
+        content: '••';
+    }
+
+    60% {
+        content: '•••';
+    }
+
+    80% {
+        content: '••••';
+    }
 }
 
 #upload-btn {
@@ -326,11 +368,11 @@ input[type="file"] {
         flex-wrap: wrap;
     }
 
-    #editor-controls div{
+    #editor-controls div {
         flex: 1 1 45%;
     }
 
-    #editor-controls span{
+    #editor-controls span {
         display: block;
     }
 
@@ -341,7 +383,7 @@ input[type="file"] {
         bottom: -20px;
         border-radius: 0px 10px 10px 10px;
     }
-    
+
     .delete-btn {
         width: 20px;
         height: 20px;
