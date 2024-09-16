@@ -65,6 +65,7 @@ h1 {
     margin: 0;
     color: var(--primary-color);
     font-weight: 500;
+    line-height: 100%;
     text-align: center;
 }
 
@@ -355,13 +356,8 @@ input[type="file"] {
 }
 
 @media (max-width: 600px) {
-    #app {
-        padding: 10px;
-    }
-
     button {
         width: 100%;
-        margin-bottom: 10px;
     }
 
     #editor-controls {

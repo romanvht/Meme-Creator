@@ -1,51 +1,16 @@
 class MemeGenerator {
     constructor() {
         this.currentImage = null;
-        this.currentTemplateIndex = null;
+        this.currentTextField = null;
         this.textFields = [];
-        this.templates = [];
-
-        this.initElements();
-        this.initHandlers();
 
         this.storage = new Storage();
+        this.template = new TemplateManager(this.storage);
+        this.ui = new UIManager(this);
 
-        this.storage.onDbReady(() => {
-            this.loadTemplatesFromDB();
+        this.template.loadTemplates(() => {
+            this.ui.updateTemplatesList(this.template.templates);
         });
-    }
-
-    initElements() {
-        this.preloader = document.getElementById('p_prldr');
-        this.uploadSection = document.getElementById('upload-section');
-        this.imageUpload = document.getElementById('image-upload');
-        this.uploadBtn = document.getElementById('upload-btn');
-        this.editor = document.getElementById('editor');
-        this.memeImage = document.getElementById('meme-image');
-        this.textFieldsContainer = document.getElementById('text-fields-container');
-        this.addTextFieldBtn = document.getElementById('add-text-field');
-        this.textColor = document.getElementById('text-color');
-        this.backgroundColor = document.getElementById('background-color');
-        this.templatesList = document.getElementById('templates-list');
-        this.templatesContainer = document.getElementById('templates-container');
-        this.memeCreator = document.getElementById('meme-creator');
-        this.memePreview = document.getElementById('meme-preview');
-        this.generateMemeBtn = document.getElementById('generate-button');
-        this.downloadMemeBtn = document.getElementById('download-button');
-        this.fontSizeControl = document.getElementById('font-size');
-        this.textAlignControl = document.getElementById('text-align-control');
-    }
-
-    initHandlers() {
-        this.uploadBtn.addEventListener('click', () => this.imageUpload.click());
-        this.imageUpload.addEventListener('change', (e) => this.handleImageUpload(e));
-        this.addTextFieldBtn.addEventListener('click', () => this.addTextField());
-        this.textColor.addEventListener('change', () => this.updateTextColor());
-        this.backgroundColor.addEventListener('change', () => this.updateBackgroundColor());
-        this.fontSizeControl.addEventListener('input', () => this.changeFontSize());
-        this.textAlignControl.addEventListener('change', () => this.changeTextAlign());
-        this.generateMemeBtn.addEventListener('click', () => this.generateMeme());
-        this.downloadMemeBtn.addEventListener('click', () => this.downloadMeme());
     }
 
     handleImageUpload(e) {
@@ -54,14 +19,12 @@ class MemeGenerator {
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.currentImage = event.target.result;
-                this.memeImage.src = this.currentImage;
-                this.editor.style.display = 'block';
-                this.uploadSection.style.display = 'none';
-                this.templatesList.style.display = 'none';
-                this.memePreview.innerHTML = '';
-                this.textFieldsContainer.innerHTML = '';
+                this.ui.setMemeImage(this.currentImage);
+                this.ui.showEditor();
+                this.ui.clearMemePreview();
+                this.ui.clearTextFields();
                 this.textFields = [];
-                this.currentTemplateIndex = this.templates.length > 0 ? this.templates[this.templates.length - 1].index + 1 : 0;
+                this.currentTemplateIndex = this.template.getNextTemplateIndex();
             };
             reader.readAsDataURL(file);
         } else {
@@ -91,7 +54,7 @@ class MemeGenerator {
         textInput.innerHTML = text;
 
         textField.appendChild(textInput);
-        this.textFieldsContainer.appendChild(textField);
+        this.ui.textFieldsContainer.appendChild(textField);
         this.makeResizableAndDraggable(textField);
 
         textField.addEventListener('click', () => this.selectTextField(textField));
@@ -116,49 +79,49 @@ class MemeGenerator {
 
     selectTextField(textField) {
         this.currentTextField = textField;
-        this.fontSizeControl.value = parseInt(textField.style.fontSize);
-        this.textAlignControl.value = textField.style.textAlign;
+        this.ui.fontSizeControl.value = parseInt(textField.style.fontSize);
+        this.ui.textAlignControl.value = textField.style.textAlign;
 
         const textRgb = textField.style.color;
-        this.textColor.value = textRgb.startsWith('rgb') ? `#${textRgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : textRgb;
+        this.ui.textColor.value = textRgb.startsWith('rgb') ? `#${textRgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : textRgb;
 
         const backgroundRgb = textField.style.backgroundColor;
-        this.backgroundColor.value = backgroundRgb.startsWith('rgb') ? `#${backgroundRgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : backgroundRgb;
+        this.ui.backgroundColor.value = backgroundRgb.startsWith('rgb') ? `#${backgroundRgb.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('')}` : backgroundRgb;
     
         document.querySelectorAll('.text-field').forEach(field => field.classList.remove('active'));
         textField.classList.add('active');
     }
-    
+
     updateBackgroundColor() {
         if (this.currentTextField) {
-            this.currentTextField.style.backgroundColor = this.backgroundColor.value;
+            this.currentTextField.style.backgroundColor = this.ui.backgroundColor.value;
         }
     }
 
     updateTextColor() {
         if (this.currentTextField) {
-            this.currentTextField.style.color = this.textColor.value;
+            this.currentTextField.style.color = this.ui.textColor.value;
         }
     }
 
     changeFontSize() {
         if (this.currentTextField) {
-            this.currentTextField.style.fontSize = `${this.fontSizeControl.value}px`;
+            this.currentTextField.style.fontSize = `${this.ui.fontSizeControl.value}px`;
         }
     }
 
     changeTextAlign() {
         if (this.currentTextField) {
-            this.currentTextField.style.textAlign = this.textAlignControl.value;
+            this.currentTextField.style.textAlign = this.ui.textAlignControl.value;
         }
-    }    
+    }
 
     makeResizableAndDraggable(element) {
         let isResizing = false;
         let isDragging = false;
         let startX, startY, startWidth, startHeight;
 
-        const image = this.memeImage;
+        const image = this.ui.memeImage;
 
         const deleter = document.createElement('div');
         deleter.className = 'delete-btn';
@@ -234,109 +197,11 @@ class MemeGenerator {
         function stopResize() {
             isResizing = false;
         }
-    }   
+    }
 
     removeField(textField) {
         textField.remove();
         this.textFields = this.textFields.filter(field => field.element !== textField);
-    }
-
-    updateTemplatesList() {
-        if(this.templates.length === 0){
-            this.templatesContainer.innerHTML = 'Вы пока не сохраняли изображения';
-            return;
-        }
-
-        this.templatesContainer.innerHTML = '';
-        this.templates.forEach((template, index) => {
-            const templateEl = document.createElement('div');
-            templateEl.className = 'template-item';
-
-            const img = document.createElement('img');
-            img.src = template.image;
-            img.alt = `${template.index}`;
-
-            const deleteBtn = document.createElement('div');
-            deleteBtn.className = 'delete-template-btn';
-
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.deleteTemplateFromDB(template.index);
-            });
-
-            templateEl.appendChild(img);
-            templateEl.appendChild(deleteBtn);
-            templateEl.addEventListener('click', () => this.loadTemplate(index));
-            this.templatesContainer.appendChild(templateEl);
-        });
-    }
-
-    loadTemplate(index) {
-        const template = this.templates[index];
-        this.currentImage = template.image;
-        this.memeImage.src = this.currentImage;
-        this.memePreview.innerHTML = '';
-
-        this.uploadSection.style.display = 'none';
-        this.templatesList.style.display = 'none';
-        this.editor.style.display = 'block';
-
-        this.textFieldsContainer.innerHTML = '';
-        this.textFields = [];
-
-        template.textFields.forEach((field) => {
-            this.addTextField(
-                field.position.left,
-                field.position.top,
-                field.size.width,
-                field.size.height,
-                field.color,
-                field.backgroundColor,
-                field.text,
-                field.fontSize,
-                field.textAlign
-            );
-        });
-
-        this.currentTemplateIndex = index;
-    }
-
-    saveTemplate() {
-        if (!this.currentImage) {
-            return;
-        }
-
-        const templateData = {
-            index: this.currentTemplateIndex,
-            image: this.currentImage,
-            textFields: this.textFields.map(field => ({
-                position: field.getPosition(),
-                size: field.getSize(),
-                color: field.getColor(),
-                backgroundColor: field.getBackgroundColor(),
-                text: field.getText(),
-                fontSize: field.getFontSize(),
-                textAlign: field.getTextAlign()
-            }))
-        };
-
-        this.storage.saveTemplate(templateData, () => {
-            this.updateTemplatesList();
-        });
-    }
-
-    loadTemplatesFromDB() {
-        this.storage.loadTemplates((templates) => {
-            this.templates = templates;
-            this.updateTemplatesList();
-        });
-    }
-
-    deleteTemplateFromDB(index) {
-        this.storage.deleteTemplate(index, () => {
-            this.templates = this.templates.filter(template => template.index !== index);
-            this.updateTemplatesList();
-        });
     }
 
     generateMeme() {
@@ -350,13 +215,13 @@ class MemeGenerator {
 
             this.textFields.forEach((field) => {
                 const rect = field.element.getBoundingClientRect();
-                const containerRect = this.memeImage.getBoundingClientRect();
+                const containerRect = this.ui.memeImage.getBoundingClientRect();
 
                 const left = rect.left - containerRect.left;
                 const top = rect.top - containerRect.top;
 
-                const scaleX = canvas.width / this.memeImage.width;
-                const scaleY = canvas.height / this.memeImage.height;
+                const scaleX = canvas.width / this.ui.memeImage.width;
+                const scaleY = canvas.height / this.ui.memeImage.height;
 
                 const xPos = left * scaleX;
                 const yPos = top * scaleY;
@@ -382,11 +247,9 @@ class MemeGenerator {
                 this.wrapText(ctx, field.getText(), xPos, yPos, maxWidth, maxHeight, lineHeight, textAlign);
             });
 
-            this.memePreview.innerHTML = '';
-            this.memePreview.appendChild(canvas);
-            this.editor.style.display = 'none';
-            this.memeCreator.style.display = 'block';
-            this.downloadMemeBtn.style.display = 'block';
+            this.ui.clearMemePreview();
+            this.ui.memePreview.appendChild(canvas);
+            this.ui.showMemePreview();
 
             this.saveTemplate();
         };
@@ -441,21 +304,74 @@ class MemeGenerator {
         });
     }
 
+    saveTemplate() {
+        if (!this.currentImage) {
+            return;
+        }
+
+        const templateData = {
+            index: this.currentTemplateIndex,
+            image: this.currentImage,
+            textFields: this.textFields.map(field => ({
+                position: field.getPosition(),
+                size: field.getSize(),
+                color: field.getColor(),
+                backgroundColor: field.getBackgroundColor(),
+                text: field.getText(),
+                fontSize: field.getFontSize(),
+                textAlign: field.getTextAlign()
+            }))
+        };
+
+        this.template.saveTemplate(templateData, () => {
+            this.ui.updateTemplatesList(this.template.templates);
+        });
+    }
+
+    deleteTemplate(index) {
+        this.template.deleteTemplate(index, () => {
+            this.ui.updateTemplatesList(this.template.templates);
+        });
+    }
+
+    loadTemplate(index) {
+        const template = this.template.getTemplate(index);
+        this.currentImage = template.image;
+        this.ui.setMemeImage(this.currentImage);
+        this.ui.clearMemePreview();
+        this.ui.showEditor();
+        this.ui.clearTextFields();
+        this.textFields = [];
+
+        template.textFields.forEach((field) => {
+            this.addTextField(
+                field.position.left,
+                field.position.top,
+                field.size.width,
+                field.size.height,
+                field.color,
+                field.backgroundColor,
+                field.text,
+                field.fontSize,
+                field.textAlign
+            );
+        });
+
+        this.currentTemplateIndex = template.index;
+    }
+
     downloadMeme() {
-        const downloadBtn = this.downloadMemeBtn;
-        downloadBtn.classList.add('loading');
-        downloadBtn.disabled = true;
-    
-        const canvas = this.memePreview.querySelector('canvas');
-    
+        this.ui.setDownloadButtonState(true);
+
+        const canvas = this.ui.memePreview.querySelector('canvas');
+
         canvas.toBlob((blob) => {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'meme.png';
             link.click();
 
-            downloadBtn.classList.remove('loading');
-            downloadBtn.disabled = false;
+            this.ui.setDownloadButtonState(false);
         }, 'image/png');
-    }       
+    }
 }
