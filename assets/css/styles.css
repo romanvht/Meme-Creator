@@ -357,6 +357,7 @@ input[type="file"] {
 @media (max-width: 600px) {
     button {
         width: 100%;
+        padding: 12px 0px;
     }
 
     #editor-controls {
