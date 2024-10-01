@@ -179,7 +179,7 @@ class MemeGenerator {
     
         const resizer = document.createElement('div');
         resizer.className = 'resizer';
-        resizer.innerText = '↔';
+        resizer.innerText = '⤡';
         element.appendChild(resizer);
     
         resizer.addEventListener('mousedown', initResize);
