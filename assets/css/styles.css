@@ -123,12 +123,70 @@ input[type="file"] {
     padding: 2px;
     outline: 1px dotted rgba(0, 0, 0, .3);
     color: var(--text-color);
-    cursor: move;
+    cursor: grab;
     touch-action: none;
 }
 
 .text-field.active {
     outline: 1px dotted rgba(0, 0, 0, .9);
+}
+
+.rotator {
+    width: 14px;
+    height: 14px;
+    background: green;
+    color: #fff;
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    cursor: url('../img/rotate.png') 12 0, se-resize;
+    border-radius: 7px 7px 7px 0px;
+    display: none;
+    font-size: 0;
+}
+
+.resizer {
+    width: 14px;
+    height: 14px;
+    background: blue;
+    color: #fff;
+    position: absolute;
+    right: -14px;
+    bottom: -14px;
+    cursor: se-resize;
+    border-radius: 0px 7px 7px 7px;
+    display: none;
+    font-size: 0;
+}
+
+.resizer:hover {
+    background: rgb(0, 0, 110);
+}
+
+.delete-btn {
+    width: 14px;
+    height: 14px;
+    background: rgb(255, 0, 0);
+    color: #fff;
+    position: absolute;
+    left: -14px;
+    top: -14px;
+    cursor: url('../img/delete.png') 0 0, not-allowed;
+    border-radius: 7px 7px 0px 7px;
+    display: none;
+    font-size: 0;
+}
+
+.text-field.active .rotator {
+    display: inline-block;
+}
+
+.text-field.active .resizer {
+    display: inline-block;
+}
+
+.text-field.active .delete-btn {
+    display: inline-block;
 }
 
 .text-input {
@@ -193,32 +251,6 @@ input[type="file"] {
 
 .delete-template-btn:hover {
     background-color: rgb(110, 0, 0);
-}
-
-.resizer {
-    width: 10px;
-    height: 10px;
-    background: blue;
-    position: absolute;
-    right: -10px;
-    bottom: -10px;
-    cursor: se-resize;
-    border-radius: 0px 5px 5px 5px;
-}
-
-.resizer:hover {
-    background: rgb(0, 0, 110);
-}
-
-.delete-btn {
-    width: 10px;
-    height: 10px;
-    background: rgb(255, 0, 0);
-    position: absolute;
-    right: -10px;
-    top: -10px;
-    cursor: pointer;
-    border-radius: 5px 5px 5px 0px;
 }
 
 .delete-btn:hover {
@@ -372,19 +404,33 @@ input[type="file"] {
         display: block;
     }
 
+    .rotator {
+        width: 20px;
+        height: 20px;
+        top: -20px;
+        right: -20px;
+        border-radius: 10px 10px 10px 0px;
+        font-size: 12px;
+        line-height: 20px;
+    }
+
     .resizer {
         width: 20px;
         height: 20px;
         right: -20px;
         bottom: -20px;
         border-radius: 0px 10px 10px 10px;
+        font-size: 12px;
+        line-height: 20px;
     }
 
     .delete-btn {
         width: 20px;
         height: 20px;
-        right: -20px;
+        left: -20px;
         top: -20px;
-        border-radius: 10px 10px 10px 0px;
+        border-radius: 10px 10px 0px 10px;
+        font-size: 12px;
+        line-height: 20px;
     }
 }

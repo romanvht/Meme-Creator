@@ -32,7 +32,7 @@ class MemeGenerator {
         }
     }
 
-    addTextField(left = '5%', top = '5%', width = '30%', height = '15%', color = '#000000', backgroundColor = 'rgba(0, 0, 0, 0)', text = '', fontSize = 16, textAlign = 'center') {
+    addTextField(left = '5%', top = '5%', width = '30%', height = '15%', rotation = 0, color = '#000000', backgroundColor = 'rgba(0, 0, 0, 0)', text = '', fontSize = 16, textAlign = 'center') {
         const textField = document.createElement('div');
         textField.className = 'text-field';
 
@@ -53,9 +53,16 @@ class MemeGenerator {
         textInput.contentEditable = "plaintext-only";
         textInput.innerHTML = text;
 
+        textField.style.transform = `rotate(${rotation}deg)`;
+        textField.setAttribute('data-angle', rotation);
         textField.appendChild(textInput);
+        
         this.ui.textFieldsContainer.appendChild(textField);
-        this.makeResizableAndDraggable(textField);
+
+        this.makeDraggable(textField);
+        this.makeResizable(textField);
+        this.makeRotatable(textField);
+        this.makeDeletable(textField);
 
         textField.addEventListener('click', () => this.selectTextField(textField));
 
@@ -70,6 +77,7 @@ class MemeGenerator {
                 width: textField.style.width,
                 height: textField.style.height
             }),
+            getRotation: () => textField.getAttribute('data-angle') || 0,
             getColor: () => textField.style.color,
             getBackgroundColor: () => textField.style.backgroundColor,
             getFontSize: () => parseInt(textField.style.fontSize),
@@ -116,65 +124,76 @@ class MemeGenerator {
         }
     }
 
-    makeResizableAndDraggable(element) {
-        let isResizing = false;
-        let isDragging = false;
-        let startX, startY, startWidth, startHeight;
-
-        const image = this.ui.memeImage;
-
+    makeDeletable(element) {
         const deleter = document.createElement('div');
         deleter.className = 'delete-btn';
+        deleter.innerText = 'X';
         element.appendChild(deleter);
 
-        const resizer = document.createElement('div');
-        resizer.className = 'resizer';
-        element.appendChild(resizer);
+        deleter.addEventListener('click', () => this.removeField(element));
+    }
 
+    makeDraggable(element) {
+        let startX, startY;
+        const image = this.ui.memeImage;
+    
         element.addEventListener('mousedown', initDrag);
         document.addEventListener('mousemove', drag);
         document.addEventListener('mouseup', stopDrag);
-
+    
         element.addEventListener('touchstart', initDrag);
         document.addEventListener('touchmove', drag);
         document.addEventListener('touchend', stopDrag);
-
-        resizer.addEventListener('mousedown', initResize);
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', stopResize);
-
-        resizer.addEventListener('touchstart', initResize);
-        document.addEventListener('touchmove', resize);
-        document.addEventListener('touchend', stopResize);
-
-        deleter.addEventListener('click', () => this.removeField(element));
-
+    
         function initDrag(e) {
-            if (e.target === resizer) return;
-            isDragging = true;
+            if (element.isResizing || element.isRotating) return;
+            element.isDragging = true;
+
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
             startX = clientX - element.offsetLeft;
             startY = clientY - element.offsetTop;
         }
-
+    
         function drag(e) {
-            if (!isDragging) return;
+            if (!element.isDragging) return;
+            
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
+    
             const newLeft = clientX - startX;
             const newTop = clientY - startY;
-            
+    
             element.style.left = `${(newLeft / image.offsetWidth * 100).toFixed(2)}%`;
             element.style.top = `${(newTop / image.offsetHeight * 100).toFixed(2)}%`;
         }
-
+    
         function stopDrag() {
-            isDragging = false;
+            element.isDragging = false;
         }
+    }
 
+    makeResizable(element) {
+        let startX, startY, startWidth, startHeight;
+        const image = this.ui.memeImage;
+    
+        const resizer = document.createElement('div');
+        resizer.className = 'resizer';
+        resizer.innerText = '↔';
+        element.appendChild(resizer);
+    
+        resizer.addEventListener('mousedown', initResize);
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+    
+        resizer.addEventListener('touchstart', initResize);
+        document.addEventListener('touchmove', resize);
+        document.addEventListener('touchend', stopResize);
+    
         function initResize(e) {
-            isResizing = true;
+            if (element.isDragging || element.isRotating) return;
+            element.isResizing = true;
+
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
             startX = clientX;
@@ -182,20 +201,71 @@ class MemeGenerator {
             startWidth = parseInt(window.getComputedStyle(element).width, 10);
             startHeight = parseInt(window.getComputedStyle(element).height, 10);
         }
-
+    
         function resize(e) {
-            if (!isResizing) return;
+            if (!element.isResizing) return;
+
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
             const width = startWidth + (clientX - startX);
             const height = startHeight + (clientY - startY);
-
+    
             element.style.width = `${(width / image.offsetWidth * 100).toFixed(2)}%`;
             element.style.height = `${(height / image.offsetHeight * 100).toFixed(2)}%`;
         }
-
+    
         function stopResize() {
-            isResizing = false;
+            element.isResizing = false;
+        }
+    }    
+
+    makeRotatable(element) {
+        let centerX, centerY, startAngle, initialAngle;
+    
+        const rotator = document.createElement('div');
+        rotator.className = 'rotator';
+        rotator.innerText = '↻';
+        element.appendChild(rotator);
+    
+        rotator.addEventListener('mousedown', initRotate);
+        document.addEventListener('mousemove', rotate);
+        document.addEventListener('mouseup', stopRotate);
+    
+        rotator.addEventListener('touchstart', initRotate);
+        document.addEventListener('touchmove', rotate);
+        document.addEventListener('touchend', stopRotate);
+    
+        function initRotate(e) {
+            if (element.isDragging || element.isResizing) return;
+            element.isRotating = true;
+
+            const rect = element.getBoundingClientRect();
+            centerX = rect.left + rect.width / 2;
+            centerY = rect.top + rect.height / 2;
+
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+
+            startAngle = Math.atan2(clientY - centerY, clientX - centerX);
+            initialAngle = parseFloat(element.getAttribute('data-angle')) || 0;
+        }
+    
+        function rotate(e) {
+            if (!element.isRotating) return;
+
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+    
+            const currentAngle = Math.atan2(clientY - centerY, clientX - centerX);
+            const deltaAngle = currentAngle - startAngle;
+    
+            const angle = initialAngle + deltaAngle * (180 / Math.PI);
+            element.style.transform = `rotate(${angle}deg)`;
+            element.setAttribute('data-angle', angle);
+        }
+    
+        function stopRotate() {
+            element.isRotating = false;
         }
     }
 
@@ -208,53 +278,68 @@ class MemeGenerator {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const img = new Image();
+
         img.onload = () => {
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-
+    
+            const scaleX = canvas.width / this.ui.memeImage.width;
+            const scaleY = canvas.height / this.ui.memeImage.height;
+    
             this.textFields.forEach((field) => {
-                const rect = field.element.getBoundingClientRect();
-                const containerRect = this.ui.memeImage.getBoundingClientRect();
-
-                const left = rect.left - containerRect.left;
-                const top = rect.top - containerRect.top;
-
-                const scaleX = canvas.width / this.ui.memeImage.width;
-                const scaleY = canvas.height / this.ui.memeImage.height;
-
-                const xPos = left * scaleX;
-                const yPos = top * scaleY;
-                const maxWidth = rect.width * scaleX;
-                const maxHeight = rect.height * scaleY;
-                const backgroundColor = field.getBackgroundColor();
-                const fontSize = parseInt(window.getComputedStyle(field.element).fontSize, 10) * scaleY;
+                const width = field.element.offsetWidth * scaleX;
+                const height = field.element.offsetHeight * scaleY;
+    
+                const leftPercent = parseFloat(field.element.style.left);
+                const topPercent = parseFloat(field.element.style.top);
+    
+                const xPos = canvas.width * (leftPercent / 100);
+                const yPos = canvas.height * (topPercent / 100);
+    
+                const rotation = parseFloat(field.getRotation()) || 0;
+    
+                const fontSize = parseInt(window.getComputedStyle(field.element).fontSize, 10) * ((scaleX + scaleY) / 2);
                 const fontWeight = window.getComputedStyle(field.element).fontWeight;
                 const fontStyle = window.getComputedStyle(field.element).fontStyle;
                 const textAlign = window.getComputedStyle(field.element).textAlign;
                 const lineHeight = fontSize;
-
-                if (backgroundColor !== 'rgba(0, 0, 0, 0)') {
-                    ctx.fillStyle = backgroundColor;
-                    ctx.fillRect(xPos, yPos, maxWidth, maxHeight);
+                const backgroundColor = field.getBackgroundColor();
+                const textColor = field.getColor();
+    
+                const offscreenCanvas = document.createElement('canvas');
+                offscreenCanvas.width = width;
+                offscreenCanvas.height = height;
+                const offscreenCtx = offscreenCanvas.getContext('2d');
+    
+                if (backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent') {
+                    offscreenCtx.fillStyle = backgroundColor;
+                    offscreenCtx.fillRect(0, 0, width, height);
                 }
-
-                ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px Arial`;
-                ctx.fillStyle = field.getColor();
-                ctx.textBaseline = 'top';
-                ctx.textAlign = textAlign;
-
-                this.wrapText(ctx, field.getText(), xPos, yPos, maxWidth, maxHeight, lineHeight, textAlign);
+    
+                offscreenCtx.font = `${fontStyle} ${fontWeight} ${fontSize}px Arial`;
+                offscreenCtx.fillStyle = textColor;
+                offscreenCtx.textBaseline = 'top';
+                offscreenCtx.textAlign = textAlign;
+    
+                this.wrapText(offscreenCtx, field.getText(), 0, 0, width, height, lineHeight, textAlign);
+    
+                ctx.save();
+                ctx.translate(xPos + width / 2, yPos + height / 2);
+                ctx.rotate(rotation * Math.PI / 180);
+                ctx.drawImage(offscreenCanvas, -width / 2, -height / 2);
+                ctx.restore();
             });
-
+    
             this.ui.clearMemePreview();
             this.ui.memePreview.appendChild(canvas);
             this.ui.showMemePreview();
-
+    
             this.saveTemplate();
-        };
+        }
+
         img.src = this.currentImage;
-    }
+    }    
 
     wrapText(ctx, text, x, y, blockWidth, blockHeight, lineHeight, textAlign) {
         const paragraphs = text.split(/\n/);
@@ -315,6 +400,7 @@ class MemeGenerator {
             textFields: this.textFields.map(field => ({
                 position: field.getPosition(),
                 size: field.getSize(),
+                rotation: field.getRotation(),
                 color: field.getColor(),
                 backgroundColor: field.getBackgroundColor(),
                 text: field.getText(),
@@ -349,6 +435,7 @@ class MemeGenerator {
                 field.position.top,
                 field.size.width,
                 field.size.height,
+                field.rotation,
                 field.color,
                 field.backgroundColor,
                 field.text,
