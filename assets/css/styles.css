@@ -121,14 +121,14 @@ input[type="file"] {
     line-height: 100%;
     font-weight: 600;
     padding: 2px;
-    outline: 1px dotted rgba(0, 0, 0, .3);
+    outline: 2px ridge rgba(0, 0, 0, .5);
     color: var(--text-color);
     cursor: grab;
     touch-action: none;
 }
 
 .text-field.active {
-    outline: 1px dotted rgba(0, 0, 0, .9);
+    outline: 2px ridge rgba(0, 0, 0, 1);
 }
 
 .rotator {
